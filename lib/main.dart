@@ -1,12 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:instagram_clone/firebase_options.dart';
 import 'package:instagram_clone/responsive/mobile_screen_layout.dart';
 import 'package:instagram_clone/responsive/responsive.dart';
 import 'package:instagram_clone/responsive/web_screen_layout.dart';
 import 'package:instagram_clone/screens/login_screen.dart';
-import 'package:instagram_clone/screens/register_screen.dart';
 import 'package:instagram_clone/utils/components/colors.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -19,7 +19,7 @@ void main() async {
       url: 'https://baihknaosqlcyzmathfi.supabase.co',
       anonKey:
           'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJhaWhrbmFvc3FsY3l6bWF0aGZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQwMTU1ODYsImV4cCI6MjA0OTU5MTU4Nn0.tTHWO6M3EX3UUbMB4Vz9_bOkWbYJ14MlTQZR8imPcUQ');
-  runApp(const MyApp());
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -48,8 +48,10 @@ class MyApp extends StatelessWidget {
               }
             }
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const CircularProgressIndicator(
-                color: primaryColor,
+              return const Center(
+                child: LinearProgressIndicator(
+                  color: primaryColor,
+                ),
               );
             }
             return const LoginScreen();

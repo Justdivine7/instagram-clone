@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:instagram_clone/resources/auths/auth_methods.dart';
+import 'package:instagram_clone/responsive/mobile_screen_layout.dart';
+import 'package:instagram_clone/responsive/responsive.dart';
+import 'package:instagram_clone/responsive/web_screen_layout.dart';
 import 'package:instagram_clone/screens/register_screen.dart';
 import 'package:instagram_clone/utils/components/colors.dart';
 import 'package:instagram_clone/utils/widgets/text_field_input.dart';
@@ -27,7 +30,7 @@ class _LoginScreenState extends State<LoginScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => RegisterScreen(),
+        builder: (context) => const RegisterScreen(),
       ),
     );
   }
@@ -92,6 +95,15 @@ class _LoginScreenState extends State<LoginScreen> {
                     setState(() {
                       isLoading = false;
                     });
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const Responsive(
+                          webScreenLayout: WebScreenLayout(),
+                          mobileScreenLayout: MobileScreenLayout(),
+                        ),
+                      ),
+                    );
                     print(res);
                   } catch (e) {
                     setState(() {
@@ -136,7 +148,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Container(),
               ),
               InkWell(
-                onTap:(){
+                onTap: () {
                   navigateToSignUp();
                 },
                 child: Row(

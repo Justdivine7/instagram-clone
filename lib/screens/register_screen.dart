@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:instagram_clone/resources/auths/auth_methods.dart';
-import 'package:instagram_clone/screens/home_page.dart';
+import 'package:instagram_clone/responsive/mobile_screen_layout.dart';
+import 'package:instagram_clone/responsive/responsive.dart';
+import 'package:instagram_clone/responsive/web_screen_layout.dart';
 import 'package:instagram_clone/screens/login_screen.dart';
 import 'package:instagram_clone/utils/components/colors.dart';
 import 'package:instagram_clone/utils/image_picker.dart';
@@ -157,7 +159,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const HomePage(),
+                        builder: (context) => const Responsive(
+                          webScreenLayout: WebScreenLayout(),
+                          mobileScreenLayout: MobileScreenLayout(),
+                        ),
                       ),
                     );
                   } catch (e) {
@@ -166,7 +171,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     });
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                        content: const Text('Registration failed'),
+                        content: Text('Registration failed'),
                       ),
                     );
                     print(e);
