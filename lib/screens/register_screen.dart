@@ -9,6 +9,7 @@ import 'package:instagram_clone/responsive/responsive.dart';
 import 'package:instagram_clone/responsive/web_screen_layout.dart';
 import 'package:instagram_clone/screens/login_screen.dart';
 import 'package:instagram_clone/utils/components/colors.dart';
+import 'package:instagram_clone/utils/components/global_variables.dart';
 import 'package:instagram_clone/utils/image_picker.dart';
 import 'package:instagram_clone/utils/widgets/text_field_input.dart';
 
@@ -56,9 +57,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: SafeArea(
         child: Container(
-          padding: const EdgeInsets.symmetric(
+          padding: MediaQuery.of(context).size.width > webScreenSize ?
+            EdgeInsets.symmetric(
+            horizontal: MediaQuery.of(context).size.width/3,
+          ):const EdgeInsets.symmetric(
             horizontal: 32,
           ),
           width: double.infinity,

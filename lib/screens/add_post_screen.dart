@@ -1,6 +1,5 @@
 import 'dart:typed_data';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
@@ -17,7 +16,7 @@ class AddPostScreen extends ConsumerStatefulWidget {
 }
 
 class _AddPostScreenState extends ConsumerState<AddPostScreen> {
-  TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
   Uint8List? _file;
   bool isLoading = false;
   Future selectImage(BuildContext context) async {
@@ -25,11 +24,11 @@ class _AddPostScreenState extends ConsumerState<AddPostScreen> {
         context: context,
         builder: (context) {
           return SimpleDialog(
-            title: Text('Create a post'),
+            title: const Text('Create a post'),
             children: [
               SimpleDialogOption(
-                padding: EdgeInsets.all(20),
-                child: Text('Take a photo'),
+                padding: const EdgeInsets.all(20),
+                child: const Text('Take a photo'),
                 onPressed: () async {
                   Navigator.pop(context);
                   Uint8List file = await pickImage(ImageSource.camera);
@@ -39,8 +38,8 @@ class _AddPostScreenState extends ConsumerState<AddPostScreen> {
                 },
               ),
               SimpleDialogOption(
-                padding: EdgeInsets.all(20),
-                child: Text('Choose from gallery'),
+                padding: const EdgeInsets.all(20),
+                child: const Text('Choose from gallery'),
                 onPressed: () async {
                   Navigator.pop(context);
                   Uint8List file = await pickImage(ImageSource.gallery);
@@ -50,8 +49,8 @@ class _AddPostScreenState extends ConsumerState<AddPostScreen> {
                 },
               ),
               SimpleDialogOption(
-                padding: EdgeInsets.all(20),
-                child: Text('Cancel'),
+                padding: const EdgeInsets.all(20),
+                child: const Text('Cancel'),
                 onPressed: () async {
                   Navigator.pop(context);
                 },
@@ -80,7 +79,7 @@ class _AddPostScreenState extends ConsumerState<AddPostScreen> {
         isLoading = false;
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text('Upload successful'),
         ),
       );
@@ -91,7 +90,7 @@ class _AddPostScreenState extends ConsumerState<AddPostScreen> {
         isLoading = false;
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text('Failed to upload post'),
         ),
       );
@@ -122,7 +121,7 @@ class _AddPostScreenState extends ConsumerState<AddPostScreen> {
               onPressed: () {
                 selectImage(context);
               },
-              icon: Icon(Icons.upload),
+              icon: const Icon(Icons.upload),
             ),
           )
         : Scaffold(
@@ -155,11 +154,11 @@ class _AddPostScreenState extends ConsumerState<AddPostScreen> {
             body: Column(
               children: [
                 isLoading
-                    ? LinearProgressIndicator()
-                    : SizedBox(
+                    ? const LinearProgressIndicator()
+                    : const SizedBox(
                         height: 1,
                       ),
-                Divider(),
+                const Divider(),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -167,23 +166,24 @@ class _AddPostScreenState extends ConsumerState<AddPostScreen> {
                     CircleAvatar(
                       backgroundImage: _file != null
                           ? NetworkImage(user!.photoUrl)
-                          : NetworkImage(
+                          : const NetworkImage(
                               'https://plus.unsplash.com/premium_photo-1732757787074-0f95bf19cf73?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OXx8dXNlciUyMHByb2ZpbGUlMjBhdmF0YXJ8ZW58MHx8MHx8fDA%3D'),
                     ),
                     SizedBox(
                       width: MediaQuery.of(context).size.width * 0.4,
                       child: TextField(
                         controller: _descriptionController,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           hintText: 'Write a caption...',
-                          border: InputBorder.none,
+                          border: InputBorder.none
                         ),
+                        // maxLength: 100,
                         maxLines: 8,
                       ),
                     ),
                     SizedBox(
-                      width: 60,
-                      height: 60,
+                      width: 70,
+                      height: 70,
                       child: AspectRatio(
                         aspectRatio: 487 / 451,
                         child: Container(
@@ -192,7 +192,7 @@ class _AddPostScreenState extends ConsumerState<AddPostScreen> {
                             image: DecorationImage(
                               image: _file != null
                                   ? MemoryImage(_file!)
-                                  : NetworkImage(
+                                  : const NetworkImage(
                                       'https://plus.unsplash.com/premium_photo-1732757787074-0f95bf19cf73?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OXx8dXNlciUyMHByb2ZpbGUlMjBhdmF0YXJ8ZW58MHx8MHx8fDA%3D',
                                     ),
                               fit: BoxFit.fill,

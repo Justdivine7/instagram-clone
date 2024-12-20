@@ -17,7 +17,7 @@ class FirestoreMethods {
   }) async {
     String res = 'Some error occured';
     try {
-      String postId = Uuid().v1();
+      String postId = const Uuid().v1();
       String photoUrl = await StorageMethods().uploadImageToSupabase(
           file: file,
           bucketName: 'images',
@@ -41,4 +41,89 @@ class FirestoreMethods {
       throw Exception(err.toString);
     }
   }
+
+  Future<void> likePost(String postId, String uid, List likes) async {
+    try {
+      if (likes.contains(uid)) {
+        await _firestore.collection('posts').doc(postId).update({
+          'likes': FieldValue.arrayRemove([uid])
+        });
+      } else {
+        await _firestore.collection('posts').doc(postId).update({
+          'likes': FieldValue.arrayUnion([uid])
+        });
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+  Future<void> postComment(String postId, String text, String uid,
+      String username, String profilePic) async {
+    try {
+      if (text.isNotEmpty) {
+        String commentId = const Uuid().v1();
+        await _firestore
+            .collection('posts')
+            .doc(postId)
+            .collection('comments')
+            .doc(commentId)
+            .set({
+          'text': text,
+          'uid': uid,
+          'username': username,
+          'profilePic': profilePic,
+          'commentId': commentId,
+          'date': DateTime.now(),
+        });
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+  Future<void> deletePost(String postId) async {
+    try {
+      _firestore.collection('posts').doc(postId).delete();
+    } catch (err) {
+      print(err.toString());
+    }
+  }
+  //   Future<int> getComments(String postId) async {
+  //   try {
+  // final comment =  _firestore.collection('posts').doc(postId).collection('comments').get();
+  //     return comment.docs.length;
+  //   } catch (err) {
+  //     print(err.toString());
+  //   }
+  // }
+
+  Future<void> followUser(
+    String followerId,
+    String uid,
+  ) async {
+    try {
+      DocumentSnapshot snap =
+          await _firestore.collection('users').doc(uid).get();
+      List following = (snap.data()! as dynamic)['following'];
+      if (following.contains(followerId)) {
+        await _firestore.collection('users').doc(followerId).update({
+          'followers': FieldValue.arrayRemove([uid])
+        });
+        await _firestore.collection('users').doc(uid).update({
+          'following': FieldValue.arrayRemove([followerId])
+        });
+      }else{
+        await _firestore.collection('users').doc(followerId).update({
+          'followers': FieldValue.arrayUnion([uid])
+        });
+        await _firestore.collection('users').doc(uid).update({
+          'following': FieldValue.arrayUnion([followerId])
+        });
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+  
 }

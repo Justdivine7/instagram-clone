@@ -2,7 +2,6 @@ import 'dart:typed_data';
 
 import 'package:firebase_auth/firebase_auth.dart';
  import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:uuid/uuid.dart';
 
 class StorageMethods {
   final SupabaseClient supabase = Supabase.instance.client;

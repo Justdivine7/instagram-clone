@@ -1,6 +1,7 @@
-import 'package:flutter/cupertino.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:instagram_clone/models/post.dart';
 import 'package:instagram_clone/utils/components/colors.dart';
 import 'package:instagram_clone/utils/widgets/post_card.dart';
 
@@ -25,13 +26,32 @@ class _FeedScreenState extends State<FeedScreen> {
         actions: [
           IconButton(
             onPressed: () {},
-            icon: Icon(
+            icon: const Icon(
               Icons.messenger_outline,
             ),
           ),
         ],
       ),
-      body: PostCard(),
+      body: StreamBuilder(
+        stream: FirebaseFirestore.instance.collection('posts').snapshots(),
+        builder: (context,
+            AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const LinearProgressIndicator();
+          }
+          final posts = snapshot.data!.docs.map((doc) {
+            return Post.fromMap(doc.data());
+          }).toList();
+          return ListView.builder(
+            itemCount: snapshot.data!.docs.length,
+            itemBuilder: (context, index) {
+              return PostCard(
+                snap: posts[index],
+              );
+            },
+          );
+        },
+      ),
     );
   }
 }

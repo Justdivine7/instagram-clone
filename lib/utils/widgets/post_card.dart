@@ -1,35 +1,68 @@
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:instagram_clone/utils/components/colors.dart';
+import 'dart:async';
 
-class PostCard extends StatefulWidget {
-  const PostCard({super.key});
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:instagram_clone/provider/user_provider.dart';
+import 'package:instagram_clone/resources/firestore_methods.dart';
+import 'package:instagram_clone/screens/comments_screen.dart';
+import 'package:instagram_clone/utils/components/colors.dart';
+import 'package:intl/intl.dart';
+
+class PostCard extends ConsumerStatefulWidget {
+  final snap;
+  const PostCard({
+    super.key,
+    required this.snap,
+  });
 
   @override
-  State<PostCard> createState() => _PostCardState();
+  ConsumerState<PostCard> createState() => _PostCardState();
 }
 
-class _PostCardState extends State<PostCard> {
+class _PostCardState extends ConsumerState<PostCard> {
+  int comment = 0;
+  StreamSubscription<int>? commentLength;
+  void getComments() {
+    commentLength = FirebaseFirestore.instance
+        .collection('posts')
+        .doc(widget.snap.postId)
+        .collection('comments')
+        .snapshots()
+        .map((snapshot) => snapshot.docs.length)
+        .listen((count) {
+      setState(() {
+        comment = count;
+      });
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getComments();
+  }
+
   @override
   Widget build(BuildContext context) {
+    final user = ref.watch(userProvider);
     return Container(
       color: mobileBackgroundColor,
-      padding: EdgeInsets.symmetric(vertical: 10),
+      padding: const EdgeInsets.symmetric(vertical: 10),
       child: Column(
         children: [
           Container(
-            padding: EdgeInsets.symmetric(vertical: 4, horizontal: 16)
+            padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 16)
                 .copyWith(right: 0),
             child: Row(
               children: [
                 CircleAvatar(
                   radius: 14,
-                  backgroundImage: NetworkImage(
-                      'https://images.unsplash.com/photo-1624561172888-ac93c696e10c?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTJ8fHVzZXIlMjBwcm9maWxlJTIwYXZhdGFyfGVufDB8fDB8fHww'),
+                  backgroundImage: NetworkImage(widget.snap.profImage),
                 ),
                 Expanded(
                   child: Padding(
-                    padding: EdgeInsets.only(
+                    padding: const EdgeInsets.only(
                       left: 8,
                     ),
                     child: Column(
@@ -37,8 +70,8 @@ class _PostCardState extends State<PostCard> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Username',
-                          style: TextStyle(
+                          widget.snap.username,
+                          style: const TextStyle(
                             fontWeight: FontWeight.bold,
                           ),
                         )
@@ -53,13 +86,20 @@ class _PostCardState extends State<PostCard> {
                       builder: (context) => Dialog(
                         child: ListView(
                           shrinkWrap: true,
-                          padding: EdgeInsets.symmetric(vertical: 16),
-                          children: ['Delete', 'Restrict', 'Block', 'Report']
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          children: [
+                            'Delete',
+                          ]
                               .map(
                                 (element) => InkWell(
-                                  onTap: () {},
+                                  onTap: () async {
+                                    Navigator.pop(context);
+                                    await FirestoreMethods().deletePost(
+                                      widget.snap.postId,
+                                    );
+                                  },
                                   child: Container(
-                                    padding: EdgeInsets.symmetric(
+                                    padding: const EdgeInsets.symmetric(
                                         vertical: 12, horizontal: 16),
                                     child: Text(element),
                                   ),
@@ -70,7 +110,7 @@ class _PostCardState extends State<PostCard> {
                       ),
                     );
                   },
-                  icon: Icon(Icons.more_vert),
+                  icon: const Icon(Icons.more_vert),
                 )
               ],
             ),
@@ -79,27 +119,46 @@ class _PostCardState extends State<PostCard> {
             height: MediaQuery.of(context).size.width * 0.5,
             width: double.infinity,
             child: Image.network(
-              'https://images.unsplash.com/photo-1639149888905-fb39731f2e6c?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTR8fHVzZXIlMjBwcm9maWxlJTIwYXZhdGFyfGVufDB8fDB8fHww',
+              widget.snap.postUrl,
               fit: BoxFit.contain,
             ),
           ),
           Row(
             children: [
               IconButton(
-                onPressed: () {},
-                icon: Icon(
-                  Icons.favorite,
-                ),
-              ),
+                  onPressed: () async {
+                    await FirestoreMethods().likePost(
+                      widget.snap.postId,
+                      user!.uid,
+                      widget.snap.likes,
+                    );
+                  },
+                  icon: widget.snap!.likes.contains(user?.uid)
+                      ? const Icon(
+                          Icons.favorite,
+                          color: Colors.red,
+                        )
+                      : const Icon(
+                          Icons.favorite_border,
+                        )),
               IconButton(
-                onPressed: () {},
-                icon: Icon(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => CommentsScreen(
+                        comment: widget.snap,
+                      ),
+                    ),
+                  );
+                },
+                icon: const Icon(
                   Icons.comment_outlined,
                 ),
               ),
               IconButton(
                 onPressed: () {},
-                icon: Icon(
+                icon: const Icon(
                   Icons.send,
                 ),
               ),
@@ -108,8 +167,8 @@ class _PostCardState extends State<PostCard> {
                   alignment: Alignment.bottomRight,
                   child: IconButton(
                     onPressed: () {},
-                    icon: Icon(
-                      Icons.bookmark,
+                    icon: const Icon(
+                      Icons.bookmark_border,
                     ),
                   ),
                 ),
@@ -117,17 +176,81 @@ class _PostCardState extends State<PostCard> {
             ],
           ),
           Container(
-            padding: EdgeInsets.symmetric(
+            padding: const EdgeInsets.symmetric(
               horizontal: 16,
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  '1,234 likes',
-                  style: Theme.of(context).textTheme.bodyMedium,
-                )
+                DefaultTextStyle(
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyMedium!
+                      .copyWith(fontWeight: FontWeight.w800),
+                  child: Text(
+                    '${widget.snap.likes.length} likes',
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                ),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.only(top: 8),
+                  child: RichText(
+                    text: TextSpan(
+                      style: const TextStyle(
+                        color: primaryColor,
+                      ),
+                      children: [
+                        TextSpan(
+                          text: widget.snap.username,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        TextSpan(
+                          text: ' ${widget.snap.description}',
+                        ),
+                        // TextSpan(
+                        //   text: '...',
+                        //   style: TextStyle(
+                        //     color: primaryColor,
+                        //   ),
+                        // ),
+                        // TextSpan(
+                        //   text: '3 days ago',
+                        //   style: TextStyle(
+                        //     color: secondaryColor,
+                        //   ),
+                        // ),
+                      ],
+                    ),
+                  ),
+                ),
+                InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const CommentsScreen(),
+                      ),
+                    );
+                  },
+                  child: Container(
+                    child: Text(
+                      'View all $comment comments',
+                      style: const TextStyle(color: secondaryColor),
+                    ),
+                  ),
+                ),
+                Container(
+                  child: Text(
+                    DateFormat.yMMMd().format(
+                      widget.snap.datePublished.toDate(),
+                    ),
+                    style: const TextStyle(color: secondaryColor),
+                  ),
+                ),
               ],
             ),
           )

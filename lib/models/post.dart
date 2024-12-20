@@ -1,6 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 
 class Post {
@@ -64,7 +65,7 @@ class Post {
       uid: map['uid'] as String,
       postId: map['postId'] as String,
       username: map['username'] as String,
-      datePublished: map['datePublished'] as String,
+      datePublished: map['datePublished'] as Timestamp,
       postUrl: map['postUrl'] as String,
       profImage: map['profImage'] as String,
       likes: List.from(
