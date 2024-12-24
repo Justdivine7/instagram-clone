@@ -148,10 +148,7 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(
                 height: 24,
               ),
-              Flexible(
-                flex: 2,
-                child: Container(),
-              ),
+             
               InkWell(
                 onTap: () {
                   navigateToSignUp();
@@ -181,6 +178,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ],
                 ),
+              ),
+               Flexible(
+                flex: 2,
+                child: Container(),
               ),
             ],
           ),

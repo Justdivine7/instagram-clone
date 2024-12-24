@@ -26,6 +26,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
     super.initState();
+    getData();
   }
 
   void getData() async {
@@ -41,6 +42,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           .collection('posts')
           .where('uid', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
           .get();
+              print("Post count: ${postSnap.docs.length}");
+print(snap.data());
       postLength = postSnap.docs.length;
       followers = snap.data()!['followers'].length;
       following = snap.data()!['following'].length;
@@ -53,10 +56,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
       setState(() {});
     } catch (err) {
       print(err.toString());
-    }
-    setState(() {
-      isLoading = true;
-    });
+    }  setState(() {
+        isLoading = false;
+      });
   }
 
   @override
@@ -136,7 +138,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                         .currentUser!.uid,
                                                   );
                                                   setState(() {
-                                                    isFollowing == false;
+                                                    isFollowing = false;
                                                     followers--;
                                                   });
                                                 },
@@ -154,7 +156,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                         .currentUser!.uid,
                                                   );
                                                   setState(() {
-                                                    isFollowing == true;
+                                                    isFollowing = true;
                                                     followers++;
                                                   });
                                                 },
@@ -182,7 +184,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         child: Text(
                           userData['bio'] ?? '',
                           style: const TextStyle(
-                            fontWeight: FontWeight.bold,
+                            // fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
@@ -198,7 +200,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const Center(
-                        child: CircularProgressIndicator(),
+                        child: LinearProgressIndicator(color: mobileSearchColor,),
+                      );
+                    }
+                    if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                      return const Center(
+                        child: Text('No posts yet'),
                       );
                     }
                     return GridView.builder(
@@ -210,6 +217,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         mainAxisSpacing: 1.5,
                         childAspectRatio: 1,
                       ),
+                      itemCount: (snapshot.data!as dynamic).docs.length,
                       itemBuilder: (context, index) {
                         DocumentSnapshot snap = snapshot.data!.docs[index];
                         return Container(

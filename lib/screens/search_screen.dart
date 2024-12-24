@@ -77,23 +77,24 @@ class _SearchScreenState extends State<SearchScreen> {
                       itemBuilder: (context, index) {
                         final details = snapshot.data!.docs[index];
                         return InkWell(
-                          onTap: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => ProfileScreen(
-                                uid: details['uid'],
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ProfileScreen(
+                                  uid: snapshot.data!.docs[index]['uid'],
+                                ),
                               ),
-                            ),
-                          ),
+                            );
+                            print(snapshot.data!.docs[index]['uid']);
+                          },
                           child: ListTile(
                             leading: CircleAvatar(
                               backgroundImage:
                                   NetworkImage(details['photoUrl']),
                             ),
                             title: Text(details['username']),
-                            onTap: () {
-                              // Navigate to user profile screen
-                            },
+                           
                           ),
                         );
                       });
